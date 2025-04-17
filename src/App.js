@@ -40,7 +40,7 @@ function App() {
     const imageData = canvas.toDataURL("image/jpeg", 0.5);
 
     try {
-      const response = await fetch("http://localhost:5000/predict", {
+      const response = await fetch("https://gesture-backend-7vfo.onrender.com/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: imageData }),
