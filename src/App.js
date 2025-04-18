@@ -38,13 +38,16 @@ function App() {
     ctx.drawImage(video, 0, 0, width, height);
 
     const imageData = canvas.toDataURL("image/jpeg", 0.5);
+    console.log("Sending image data to backend:", imageData.slice(0, 100), "...");
+
 
     try {
-      const response = await fetch("https://gesture-backend-7vfo.onrender.com/predict", {
+      const response = await fetch("http://127.0.0.1:5000/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: imageData }),
       });
+      console.log(imageData);
 
       const result = await response.json();
 
