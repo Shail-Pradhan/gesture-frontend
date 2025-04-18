@@ -42,7 +42,7 @@ function App() {
 
 
     try {
-      const response = await fetch("https://fab2-103-52-211-44.ngrok-free.app/predict", {
+      const response = await fetch("https://live-macaw-overly.ngrok-free.app/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: imageData }),
@@ -99,7 +99,7 @@ function App() {
     };
 
     const loop = (timestamp) => {
-      if (detectionEnabled && timestamp - lastFrameTime.current > 1500) {
+      if (detectionEnabled && timestamp - lastFrameTime.current > 1000) {
         captureAndSendFrame();
         lastFrameTime.current = timestamp;
       }
