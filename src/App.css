@@ -91,4 +91,11 @@ html, body {
   .info-text {
     font-size: 1rem;
   }
+  .bottom-bar .toggle-btn {
+  margin-right: 10px; /* Add spacing between buttons */
+}
+
+.bottom-bar .toggle-btn:last-child {
+  margin-right: 0; /* Remove margin for the last button */
+}
 }
