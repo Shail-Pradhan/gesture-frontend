@@ -7,6 +7,7 @@ function App() {
   const [gesture, setGesture] = useState("Waiting...");
   const [detectionEnabled, setDetectionEnabled] = useState(true);
   const [fps, setFps] = useState(0);
+  const [useRearCamera, setUseRearCamera] = useState(false); // State to toggle camera
   const gestureRef = useRef("Waiting...");
   const lastFrameTime = useRef(0);
   const frameCount = useRef(0);
@@ -35,11 +36,21 @@ function App() {
 
     canvas.width = width;
     canvas.height = height;
+
+    // Un-mirror the image if the front camera is being used (desktop or mobile)
+    if (!useRearCamera) {
+      ctx.translate(width, 0); // Flip horizontally
+      ctx.scale(-1, 1);
+    }
+
     ctx.drawImage(video, 0, 0, width, height);
 
+    // Reset transformation for future frames
+    if (!useRearCamera) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+
     const imageData = canvas.toDataURL("image/jpeg", 0.5);
-
-
 
     try {
       const response = await fetch("https://live-macaw-overly.ngrok-free.app/predict", {
@@ -61,7 +72,7 @@ function App() {
       console.error("Error sending frame:", error);
       setGesture("Error");
     }
-  }, [isMobile]);
+  }, [isMobile, useRearCamera]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -80,7 +91,7 @@ function App() {
     const setupCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user" },
+          video: { facingMode: useRearCamera ? "environment" : "user" }, // Toggle camera
           audio: false,
         });
 
@@ -106,7 +117,7 @@ function App() {
 
       frameCount.current++;
       const now = performance.now();
-      if (now - lastFpsUpdateTime.current >= 1000) {
+      if (now - lastFpsUpdateTime.current >= 1500) {
         setFps(frameCount.current);
         frameCount.current = 0;
         lastFpsUpdateTime.current = now;
@@ -124,7 +135,7 @@ function App() {
         currentVideo.srcObject.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [detectionEnabled, captureAndSendFrame]); // ✅ now includes captureAndSendFrame
+  }, [detectionEnabled, captureAndSendFrame, useRearCamera]); // Added useRearCamera dependency
 
   return (
     <div className="App">
@@ -158,6 +169,14 @@ function App() {
         >
           {detectionEnabled ? "Stop Detection" : "Start Detection"}
         </button>
+        {isMobile && (
+          <button
+            onClick={() => setUseRearCamera((prev) => !prev)}
+            className="toggle-btn"
+          >
+            {useRearCamera ? "Use Front Camera" : "Use Rear Camera"}
+          </button>
+        )}
       </div>
     </div>
   );
